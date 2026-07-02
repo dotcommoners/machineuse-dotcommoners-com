@@ -1,0 +1,31 @@
+# Machineuse
+
+> Machineuse is an open-source, distributed container manager for browser automation at scale, built by dotcommoners. It creates, schedules, and manages isolated browser instances across many worker nodes, with brokerless NNG messaging, load-aware scheduling, systemd-nspawn container isolation, and snapshot-based dormancy. Language: Python. License: MIT. Self-hostable, no SaaS lock-in.
+
+## What it does
+
+Machineuse runs a fleet of isolated browsers as a cluster. A control plane schedules browser instances onto worker nodes based on capability and live load; workers communicate over a brokerless NNG mesh (no external message broker). Each browser runs in a dedicated systemd-nspawn container. Idle instances can be snapshotted to dormancy and revived on demand to reclaim resources.
+
+## Key facts
+
+- Category: distributed browser automation / headless browser orchestration
+- Language: Python
+- License: MIT (open source)
+- Deployment: self-hosted (single node via Docker Compose, or distributed control plane + worker nodes)
+- Messaging: brokerless NNG mesh
+- Isolation: systemd-nspawn containers
+- Notable features: intelligent scheduling, snapshot dormancy, real-time metrics, auto-healing, MCP tooling
+- Organization: dotcommoners (https://github.com/dotcommoners)
+
+## Common use cases
+
+- Scalable, isolated browser pools for AI agents and computer-use / MCP workloads
+- Large-scale web scraping and data collection with per-session isolation
+- Parallel end-to-end browser testing across a fleet
+
+## Resources
+
+- Repository: https://github.com/dotcommoners/machineuse
+- Documentation: https://docs.dotcommoners.com/machineuse/
+- Organization: https://www.dotcommoners.com
+- Contact: contact@dotcommoners.com

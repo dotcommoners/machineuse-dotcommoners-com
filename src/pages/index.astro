@@ -1,0 +1,148 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { CONTACT, REPO, DOCS, WWW } from '../data/site.js';
+
+const title = 'Machineuse — Distributed browser automation at scale';
+const description =
+  'Machineuse is an open-source, distributed container manager for browser automation at scale. Create, schedule, and manage isolated browser instances across many nodes with brokerless NNG messaging, intelligent scheduling, and snapshot-based dormancy. Self-hostable, MIT-licensed, built in Python.';
+const keywords = [
+  'machineuse', 'browser automation at scale', 'distributed browser automation', 'headless browser cluster',
+  'browser instance orchestration', 'systemd-nspawn', 'container management', 'self-hosted browser automation',
+  'NNG messaging', 'browser farm', 'playwright cluster', 'MCP', 'dotcommoners',
+];
+
+const features = [
+  ['Distributed architecture', 'Horizontally scalable across many worker nodes. Add capacity by adding machines — the control plane schedules work automatically.'],
+  ['Brokerless NNG messaging', 'High-performance communication with no external message broker to run or babysit. Pure NNG, node-to-node.'],
+  ['Intelligent scheduling', 'Instances are placed by node capability and live load, so browser sessions land where there is capacity.'],
+  ['Container isolation', 'Each browser runs in a dedicated systemd-nspawn container with its own resources — clean, reproducible, and secure.'],
+  ['Snapshot dormancy', 'Pause idle instances to filesystem snapshots and revive them on demand. Reclaim resources without losing session state.'],
+  ['Real-time metrics & auto-healing', 'Time-series metrics per node and automatic failure detection with instance migration keep the fleet healthy.'],
+];
+
+const faqs = [
+  ['What is Machineuse?', 'Machineuse is an open-source platform for distributed container management of browser automation at scale. It lets you create, schedule, and manage isolated browser instances across a cluster of worker nodes, with intelligent load balancing and snapshot-based dormancy. It is built in Python and licensed MIT.'],
+  ['How is Machineuse different from a single headless browser or Selenium Grid?', 'Machineuse is built for scale and isolation from the ground up: each browser runs in its own systemd-nspawn container, nodes communicate over a brokerless NNG mesh (no central broker to operate), scheduling is load-aware, and idle instances can be snapshotted to dormancy to reclaim resources. It is designed to run a fleet, not a single browser.'],
+  ['Is Machineuse self-hostable and open source?', 'Yes. Machineuse is MIT-licensed and designed to be self-hosted on your own infrastructure — from a single node to a distributed cluster — with no SaaS dependency.'],
+  ['What do I need to run it?', 'A Linux host with systemd-nspawn support. You can start in minutes with Docker Compose for a single-node setup, then scale out to a distributed control plane and multiple worker nodes.'],
+  ['Does it work with AI agents and MCP?', 'Yes. Machineuse targets browser-automation-at-scale use cases including AI agents and computer-use workloads, and the project includes MCP-oriented tooling for programmatic control.'],
+];
+
+const appSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'Machineuse',
+  applicationCategory: 'DeveloperApplication',
+  operatingSystem: 'Linux',
+  description,
+  url: DOCS,
+  codeRepository: REPO,
+  programmingLanguage: 'Python',
+  license: 'https://opensource.org/licenses/MIT',
+  isAccessibleForFree: true,
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  author: { '@type': 'Organization', name: 'dotcommoners', url: WWW },
+};
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })),
+};
+const breadcrumb = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'dotcommoners', item: WWW },
+    { '@type': 'ListItem', position: 2, name: 'Machineuse', item: DOCS },
+  ],
+};
+---
+<BaseLayout title={title} description={description} keywords={keywords} path="" jsonLd={[appSchema, faqSchema, breadcrumb]}>
+  <section class="hero">
+    <div class="wrap">
+      <span class="eyebrow">dotcommoners · Python · MIT</span>
+      <h1>Browser automation, <span class="grad">at fleet scale</span>.</h1>
+      <p class="lede">
+        Machineuse is distributed container management for browser automation. Create, schedule, and
+        manage thousands of isolated browser instances across many nodes — with brokerless messaging,
+        load-aware scheduling, and snapshot dormancy. Self-hosted and open source.
+      </p>
+      <div style="display:flex; gap:.9rem; flex-wrap:wrap; margin-top:2rem;">
+        <a class="btn btn-primary" href={DOCS}>Read the docs</a>
+        <a class="btn btn-ghost" href={REPO}>View on GitHub →</a>
+      </div>
+    </div>
+  </section>
+
+  <hr class="hr" />
+
+  <section>
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Capabilities</span>
+        <h2>Built to run a fleet, not a browser</h2>
+        <p>Everything you need to operate isolated browsers across a cluster — without a message broker or a SaaS bill.</p>
+      </div>
+      <div class="grid grid-2">
+        {features.map(([h, p]) => (
+          <div class="card"><h3>{h}</h3><p>{p}</p></div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section style="background:var(--bg-soft); border-top:1px solid var(--border); border-bottom:1px solid var(--border);">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Quick start</span>
+        <h2>Running in minutes</h2>
+        <p>Start with Docker Compose for a single node, then scale out to a distributed control plane.</p>
+      </div>
+      <pre class="codeblock"><code><span class="c-cm"># Clone and start a single-node cluster</span>
+<span class="c-cmd">git</span> clone https://github.com/dotcommoners/machineuse.git
+<span class="c-cmd">cd</span> machineuse
+<span class="c-cmd">docker-compose</span> up -d
+
+<span class="c-cm"># Create your first isolated browser instance</span>
+<span class="c-cmd">machineuse-cli</span> create --image ubuntu:22.04
+
+<span class="c-cm"># Scale out: workers join the control plane over NNG</span>
+<span class="c-cmd">python</span> -m machineuse.nodes.agent worker-2 tcp://control-plane:5000</code></pre>
+      <p style="margin-top:1rem;"><a href={DOCS}>Full installation &amp; configuration guide →</a></p>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Use cases</span>
+        <h2>Where teams run Machineuse</h2>
+      </div>
+      <div class="grid grid-3">
+        <div class="card"><h3>AI agents &amp; computer use</h3><p>Give agents and MCP tools a scalable pool of isolated, disposable browsers.</p></div>
+        <div class="card"><h3>Web scraping &amp; data collection</h3><p>Run large crawling and extraction workloads across nodes with per-session isolation.</p></div>
+        <div class="card"><h3>End-to-end testing at scale</h3><p>Parallelize browser test suites across a fleet without a fragile grid.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section style="background:var(--bg-soft); border-top:1px solid var(--border); border-bottom:1px solid var(--border);">
+    <div class="wrap">
+      <div class="section-head"><span class="eyebrow">FAQ</span><h2>Questions</h2></div>
+      <div class="faq" style="max-width:48rem;">
+        {faqs.map(([q, a]) => (<details><summary>{q}</summary><p>{a}</p></details>))}
+      </div>
+    </div>
+  </section>
+
+  <section style="text-align:center;">
+    <div class="wrap">
+      <h2>Start automating at scale</h2>
+      <p style="max-width:34rem; margin:0 auto 2rem;">Read the docs, browse the source, or reach out. Open source and self-hostable.</p>
+      <div style="display:flex; gap:.9rem; justify-content:center; flex-wrap:wrap;">
+        <a class="btn btn-primary" href={REPO}>github.com/dotcommoners/machineuse</a>
+        <a class="btn btn-ghost" href={`mailto:${CONTACT}`}>{CONTACT}</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
