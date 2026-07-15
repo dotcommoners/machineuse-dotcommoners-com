@@ -1,0 +1,117 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import Icon from '../components/Icon.astro';
+import { REPO, DOCS, WWW, HOME, softwareSchema, breadcrumb } from '../data/site.js';
+
+const title = 'Machineuse Quickstart — deploy a browser cluster';
+const description =
+  'Deploy Machineuse: start a single-node cluster with Docker Compose, create an isolated browser, then scale out worker nodes over the NNG mesh.';
+const keywords = [
+  'machineuse quickstart', 'deploy machineuse', 'self-host browser automation', 'docker-compose browser cluster',
+  'scale worker nodes', 'systemd-nspawn setup', 'machineuse getting started',
+];
+
+const steps = [
+  ['Check prerequisites', 'You need a Linux host with systemd-nspawn support and Docker installed. A single machine is enough to start; a production fleet is a control plane plus one or more worker nodes.'],
+  ['Start a single-node cluster', 'Clone the repository and bring the stack up with Docker Compose. This runs the control plane and a local worker on one host so you can create browsers immediately.'],
+  ['Create your first browser', 'Ask the control plane for an isolated browser instance. It provisions a systemd-nspawn container on an available worker and returns a handle you can connect to.'],
+  ['Scale out worker nodes', 'Start additional worker agents on more machines and point them at the control plane over NNG. Scheduling adapts automatically — new sessions land on nodes with real capacity.'],
+  ['Observe and operate', 'Watch per-node metrics from the control plane. Idle browsers snapshot to dormancy on their own, and auto-healing migrates instances off failed workers.'],
+];
+
+const crumb = breadcrumb([
+  { name: 'Machineuse', item: HOME },
+  { name: 'Quickstart', item: `${HOME}quickstart` },
+]);
+const howTo = {
+  '@context': 'https://schema.org',
+  '@type': 'HowTo',
+  name: 'Deploy a Machineuse browser cluster',
+  description,
+  step: steps.map(([name, text], i) => ({ '@type': 'HowToStep', position: i + 1, name, text })),
+};
+---
+<BaseLayout title={title} description={description} keywords={keywords} path="quickstart"
+  jsonLd={[howTo, softwareSchema, crumb]}>
+  <section class="hero" style="padding-bottom:0;">
+    <div class="wrap">
+      <Breadcrumbs items={[{ name: 'Machineuse', href: '/' }, { name: 'Quickstart' }]} />
+      <span class="eyebrow">Quickstart</span>
+      <h1>Deploy a <span class="grad">browser cluster</span> in minutes</h1>
+      <p class="lede">
+        Start with Docker Compose on a single node, create an isolated browser, then scale out to a
+        distributed control plane and worker nodes — all self-hosted, no SaaS.
+      </p>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="answer">
+        <p>To run Machineuse, start a <strong>single-node cluster with Docker Compose</strong>, create your
+          first <strong>isolated browser</strong> via the control plane, then <strong>scale out</strong> by
+          starting worker agents that join over the brokerless NNG mesh. Requires a Linux host with
+          <strong>systemd-nspawn</strong>.</p>
+      </div>
+
+      <h2 style="margin-top:2.5rem;">Deploy in five steps</h2>
+      <div class="steps" style="margin-top:1.5rem; max-width:52rem;">
+        {steps.map(([h, p]) => (
+          <div class="card"><h3>{h}</h3><p>{p}</p></div>
+        ))}
+      </div>
+
+      <h2 id="install" style="margin-top:3rem;">1 · Start a single-node cluster</h2>
+      <div class="code-window" style="margin-top:1rem;">
+        <div class="chrome"><span class="dots"><i></i><i></i><i></i></span><span class="fname">shell</span></div>
+        <pre><code><span class="tok-cm"># Clone the repository</span>
+<span class="tok-cmd">git</span> clone https://github.com/dotcommoners/machineuse.git
+<span class="tok-cmd">cd</span> machineuse
+
+<span class="tok-cm"># Bring up the control plane + a local worker</span>
+<span class="tok-cmd">docker-compose</span> up -d</code></pre>
+      </div>
+
+      <div class="callout">
+        <span class="ci"><Icon name="info" /></span>
+        <p>systemd-nspawn is a Linux-only, OS-level container manager. On non-Linux hosts, run the cluster
+          inside a Linux VM. See the <a href={DOCS}>documentation</a> for host requirements and configuration.</p>
+      </div>
+
+      <h2 id="create" style="margin-top:2.5rem;">2 · Create your first browser</h2>
+      <div class="code-window" style="margin-top:1rem;">
+        <div class="chrome"><span class="dots"><i></i><i></i><i></i></span><span class="fname">shell</span></div>
+        <pre><code><span class="tok-cm"># Ask the control plane for an isolated browser instance</span>
+<span class="tok-cmd">machineuse-cli</span> create --image ubuntu:22.04
+
+<span class="tok-cm"># List running instances and where they landed</span>
+<span class="tok-cmd">machineuse-cli</span> ls</code></pre>
+      </div>
+
+      <h2 id="scale" style="margin-top:2.5rem;">3 · Scale out worker nodes</h2>
+      <div class="code-window" style="margin-top:1rem;">
+        <div class="chrome"><span class="dots"><i></i><i></i><i></i></span><span class="fname">shell — on each new machine</span></div>
+        <pre><code><span class="tok-cm"># Join a new worker to the control plane over NNG</span>
+<span class="tok-cmd">python</span> -m machineuse.nodes.agent \
+  worker-2 tcp://control-plane:5000
+
+<span class="tok-cm"># The control plane now schedules onto worker-2 by live load</span></code></pre>
+      </div>
+
+      <div class="callout">
+        <span class="ci"><Icon name="bolt" /></span>
+        <p>There is nothing else to deploy between nodes — the NNG mesh is brokerless, so you never stand up
+          or secure a separate message broker.</p>
+      </div>
+
+      <p style="margin-top:2.5rem;">
+        <a class="btn btn-primary" href={DOCS}>Full installation guide</a>
+        <a class="btn btn-ghost" href={REPO} style="margin-left:.6rem;">Source on GitHub →</a>
+      </p>
+      <p style="margin-top:1.5rem;">
+        Next: <a href="/architecture">how it works</a> · <a href="/features">all features</a> · <a href="/use-cases">use cases</a>
+      </p>
+    </div>
+  </section>
+</BaseLayout>

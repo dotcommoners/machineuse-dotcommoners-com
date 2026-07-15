@@ -183,9 +183,11 @@ A: It is self-hosted and MIT-licensed, runs inside your network with no lock-in 
 ## Links
 
 - Site: https://machineuse.dotcommoners.com/
+- Features: https://machineuse.dotcommoners.com/features
 - Architecture: https://machineuse.dotcommoners.com/architecture
 - Use cases: https://machineuse.dotcommoners.com/use-cases
 - Comparison: https://machineuse.dotcommoners.com/comparison
+- Quickstart: https://machineuse.dotcommoners.com/quickstart
 - FAQ: https://machineuse.dotcommoners.com/faq
 - Repository: https://github.com/dotcommoners/machineuse
 - Documentation: https://docs.dotcommoners.com/machineuse/

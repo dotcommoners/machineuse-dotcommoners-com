@@ -24,9 +24,11 @@ export const PROJECTS = [
 ];
 
 export const NAV = [
+  { label: 'Features', href: '/features' },
   { label: 'Architecture', href: '/architecture' },
   { label: 'Use cases', href: '/use-cases' },
   { label: 'Comparison', href: '/comparison' },
+  { label: 'Quickstart', href: '/quickstart' },
   { label: 'FAQ', href: '/faq' },
   { label: 'Docs', href: DOCS },
   { label: 'GitHub', href: REPO },
@@ -96,3 +98,12 @@ export function breadcrumb(items) {
 }
 
 export const HOME = 'https://machineuse.dotcommoners.com/';
+
+// Honest, non-invented stats derived directly from the product's design
+// (no benchmark numbers claimed). Every value is a factual property.
+export const STATS = [
+  ['$0', 'per-session billing — MIT & self-hosted'],
+  ['1', 'container per browser (systemd-nspawn)'],
+  ['0', 'external message brokers to run'],
+  ['n', 'workers — add machines to add capacity'],
+];

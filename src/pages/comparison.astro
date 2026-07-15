@@ -56,7 +56,7 @@ const crumb = breadcrumb([
           <thead>
             <tr>
               <th scope="col">Dimension</th>
-              <th scope="col">Machineuse</th>
+              <th scope="col" class="col-hl">Machineuse</th>
               <th scope="col">Managed browser cloud<br /><span style="font-weight:400; text-transform:none; letter-spacing:0; color:var(--muted);">(e.g. Browserless, Browserbase)</span></th>
               <th scope="col">DIY Selenium / Playwright grid</th>
             </tr>
@@ -65,7 +65,7 @@ const crumb = breadcrumb([
             {rows.map(([dim, a, b, c]) => (
               <tr>
                 <th scope="row">{dim}</th>
-                <td>{a}</td>
+                <td class="col-hl"><span class="yes">{a}</span></td>
                 <td>{b}</td>
                 <td>{c}</td>
               </tr>

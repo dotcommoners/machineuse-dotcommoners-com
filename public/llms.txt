@@ -27,9 +27,11 @@ Machineuse runs a fleet of isolated browsers as a cluster. A control plane sched
 ## Pages
 
 - Home / product overview: https://machineuse.dotcommoners.com/
+- Features (scheduling, isolation, dormancy, healing, MCP): https://machineuse.dotcommoners.com/features
 - Architecture (control plane, workers, NNG mesh, isolation, dormancy): https://machineuse.dotcommoners.com/architecture
 - Use cases (scraping, test farms, agents, render): https://machineuse.dotcommoners.com/use-cases
 - Comparison (vs managed browser clouds and DIY grids): https://machineuse.dotcommoners.com/comparison
+- Quickstart (deploy a single node, then scale out workers): https://machineuse.dotcommoners.com/quickstart
 - FAQ + glossary: https://machineuse.dotcommoners.com/faq
 - Full LLM text: https://machineuse.dotcommoners.com/llms-full.txt
 

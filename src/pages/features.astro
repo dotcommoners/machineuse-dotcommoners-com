@@ -1,0 +1,117 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import Icon from '../components/Icon.astro';
+import { REPO, DOCS, WWW, HOME, softwareSchema, breadcrumb } from '../data/site.js';
+
+const title = 'Machineuse Features — scheduling, isolation & dormancy';
+const description =
+  'Machineuse features: distributed control plane, brokerless NNG mesh, load-aware scheduling, systemd-nspawn isolation, snapshot dormancy, and auto-healing.';
+const keywords = [
+  'machineuse features', 'load-aware scheduling', 'systemd-nspawn isolation', 'snapshot dormancy',
+  'brokerless NNG', 'auto-healing', 'browser orchestration features', 'MCP browser tooling',
+];
+
+const groups = [
+  {
+    label: 'Scheduling & scale',
+    desc: 'Place work where there is real capacity, and add capacity by adding machines.',
+    items: [
+      ['server', 'Distributed control plane', 'A central control plane tracks every worker and instance and decides where each browser runs. Add worker nodes and scheduling adapts automatically — no manual sharding.'],
+      ['scale', 'Load-aware scheduling', 'Placement is by node capability and live utilization, not round-robin. Sessions land where there is genuine capacity, keeping latency predictable as the fleet grows.'],
+      ['mesh', 'Brokerless NNG mesh', 'Nodes coordinate over a brokerless NNG (nanomsg-next-generation) mesh. No RabbitMQ, Kafka, or Redis to deploy, secure, and babysit as a single point of failure.'],
+    ],
+  },
+  {
+    label: 'Isolation & lifecycle',
+    desc: 'Every browser is contained, and idle ones stop costing you resources.',
+    items: [
+      ['box', 'systemd-nspawn isolation', 'Each browser runs in its own systemd-nspawn container with a dedicated filesystem and resource envelope — clean, reproducible, and isolated from every other session on the node.'],
+      ['moon', 'Snapshot-based dormancy', 'Idle instances are snapshotted to dormancy and their live CPU/memory reclaimed. On the next request, the snapshot is revived on demand — no cold rebuild, and far more logical sessions than you can keep live.'],
+      ['shield', 'Per-session containment', 'Cookies, storage, and untrusted pages stay inside a session. One browser cannot see or interfere with another sharing the node.'],
+    ],
+  },
+  {
+    label: 'Operations & integration',
+    desc: 'Observe the fleet, recover from failures, and drive it programmatically.',
+    items: [
+      ['pulse', 'Real-time metrics', 'Per-node time-series metrics stream to the control plane, so it always has a current view of utilization to schedule against.'],
+      ['heal', 'Auto-healing', 'Failure detection triggers automatic recovery, including migrating instances off a dead worker so the fleet keeps running without manual intervention.'],
+      ['bot', 'MCP tooling', 'The project includes MCP-oriented tooling so agent frameworks and computer-use workloads can request, drive, and release isolated browsers programmatically.'],
+    ],
+  },
+];
+
+const crumb = breadcrumb([
+  { name: 'Machineuse', item: HOME },
+  { name: 'Features', item: `${HOME}features` },
+]);
+const techArticle = {
+  '@context': 'https://schema.org',
+  '@type': 'TechArticle',
+  headline: 'Machineuse features',
+  description,
+  author: { '@type': 'Organization', name: 'dotcommoners', url: WWW },
+  publisher: { '@type': 'Organization', name: 'dotcommoners', url: WWW },
+  url: `${HOME}features`,
+  mainEntityOfPage: `${HOME}features`,
+};
+---
+<BaseLayout title={title} description={description} keywords={keywords} path="features"
+  jsonLd={[techArticle, softwareSchema, crumb]}>
+  <section class="hero" style="padding-bottom:0;">
+    <div class="wrap">
+      <Breadcrumbs items={[{ name: 'Machineuse', href: '/' }, { name: 'Features' }]} />
+      <span class="eyebrow">Features</span>
+      <h1>Everything you need to run a <span class="grad">browser fleet</span></h1>
+      <p class="lede">
+        Machineuse gives you the parts that are hard to build well — scheduling, isolation, a snapshot
+        lifecycle, healing, and brokerless messaging — as one self-hosted, MIT-licensed system.
+      </p>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="answer">
+        <p>Machineuse's core features are a <strong>distributed control plane</strong>, <strong>load-aware
+          scheduling</strong>, a <strong>brokerless NNG mesh</strong>, <strong>systemd-nspawn isolation</strong>,
+          <strong>snapshot-based dormancy</strong>, <strong>real-time metrics</strong>, <strong>auto-healing</strong>,
+          and <strong>MCP tooling</strong> — all self-hosted with no SaaS dependency.</p>
+      </div>
+
+      {groups.map((g) => (
+        <div style="margin-top:2.5rem;">
+          <div class="section-head" style="margin-bottom:1.4rem;">
+            <h2 style="margin-bottom:.3rem;">{g.label}</h2>
+            <p style="margin:0;">{g.desc}</p>
+          </div>
+          <div class="grid grid-3">
+            {g.items.map(([icon, h, p]) => (
+              <div class="card icard">
+                <span class="ico"><Icon name={icon} /></span>
+                <h3>{h}</h3>
+                <p>{p}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+
+      <div class="callout" style="margin-top:2.5rem;">
+        <span class="ci"><Icon name="info" /></span>
+        <p>Machineuse orchestrates the fleet — scheduling, isolation, and lifecycle. You drive the browsers
+          with your own automation tooling; see the <a href={DOCS}>docs</a> for supported drivers and
+          connection details.</p>
+      </div>
+
+      <p style="margin-top:2rem;">
+        <a class="btn btn-primary" href="/quickstart">Get started</a>
+        <a class="btn btn-ghost" href="/architecture" style="margin-left:.6rem;">See the architecture →</a>
+      </p>
+      <p style="margin-top:1.5rem;">
+        Related: <a href="/use-cases">use cases</a> · <a href="/comparison">comparison</a> · <a href="/faq">FAQ</a>
+      </p>
+    </div>
+  </section>
+</BaseLayout>
