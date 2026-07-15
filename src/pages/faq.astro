@@ -1,0 +1,100 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import { REPO, DOCS, WWW, HOME, softwareSchema, breadcrumb } from '../data/site.js';
+
+const title = 'Machineuse FAQ — open source, isolation, self-hosting & more';
+const description =
+  'Answers to common questions about Machineuse: what it is, whether it is open source, how it isolates browsers with systemd-nspawn, what snapshot dormancy is, Playwright/Puppeteer support, self-hosting, and how it compares to Browserless.';
+const keywords = [
+  'machineuse faq', 'what is machineuse', 'is machineuse open source', 'systemd-nspawn', 'snapshot dormancy',
+  'playwright support', 'puppeteer', 'self-host browser automation', 'machineuse vs browserless',
+];
+
+const faqs = [
+  ['What is Machineuse?', 'Machineuse is an open-source, distributed container manager for browser automation at scale, built by dotcommoners in Python. A control plane schedules isolated browser instances onto worker nodes by capability and live load; workers coordinate over a brokerless NNG mesh; each browser runs in a dedicated systemd-nspawn container; and idle instances are snapshotted to dormancy and revived on demand. It is MIT-licensed and self-hostable.'],
+  ['Is Machineuse open source?', 'Yes. Machineuse is released under the MIT license and developed in the open by dotcommoners. You can read, run, modify, and self-host it freely. The source is on GitHub at github.com/dotcommoners/machineuse.'],
+  ['Is it free? Is there a SaaS?', 'Machineuse is free and open source, with no SaaS offering and no per-session billing. You run it on your own infrastructure, so there is no vendor lock-in and no usage bill.'],
+  ['How does Machineuse isolate browsers?', 'Each browser instance runs inside its own systemd-nspawn container with a dedicated filesystem and resource envelope. This keeps every session isolated from the others on the same node — cookies, storage, and untrusted pages stay contained.'],
+  ['What is systemd-nspawn?', 'systemd-nspawn is a lightweight, OS-level container manager built into systemd. Machineuse uses it to give each browser a clean, reproducible, isolated environment on a Linux host without the overhead of a full virtual machine.'],
+  ['What is snapshot dormancy?', 'Snapshot dormancy is how Machineuse reclaims resources from idle browsers. When an instance goes idle, its state is captured to a filesystem snapshot and its live CPU/memory are freed. When the session is needed again, the snapshot is revived on demand, restoring state without a cold rebuild. This lets a cluster hold far more logical sessions than it can keep simultaneously live.'],
+  ['What is the brokerless NNG mesh?', 'Machineuse nodes communicate over NNG (nanomsg-next-generation) in a brokerless mesh — there is no external message broker such as RabbitMQ, Kafka, or Redis. Removing the central broker removes a common bottleneck and single point of failure, and shrinks the operational surface you have to run.'],
+  ['Does Machineuse support Playwright or Puppeteer?', 'Machineuse manages real browser instances running in isolated containers, which you drive with your own automation tooling. It focuses on orchestrating the fleet — scheduling, isolation, and lifecycle — rather than replacing your automation library. See the documentation for the supported drivers and connection details.'],
+  ['Does it work with AI agents and MCP?', 'Yes. Machineuse targets browser-automation-at-scale use cases including AI agents and computer-use workloads, and the project includes MCP-oriented tooling so agent frameworks can request, drive, and release isolated browsers programmatically.'],
+  ['How do I self-host and scale Machineuse?', 'Start on a single Linux host (with systemd-nspawn support) using Docker Compose. To scale out, run additional worker agents and point them at the control plane over NNG; the control plane schedules new work onto them automatically by capability and live load. See the docs for full installation and configuration.'],
+  ['What do I need to run it?', 'A Linux host with systemd-nspawn support. A single node is enough to start; a production fleet is a control plane plus one or more worker nodes.'],
+  ['How is Machineuse different from Browserless or a managed browser cloud?', 'Managed browser clouds run automation on the provider’s platform for a per-session fee, with traffic egressing to them. Machineuse is self-hosted and MIT-licensed: it runs inside your own network with no lock-in, gives each browser a dedicated systemd-nspawn container, schedules by live load over a brokerless mesh, and uses snapshot dormancy to keep idle sessions cheap. The tradeoff is that you operate the cluster yourself. See the full comparison for details.'],
+];
+
+const glossary = [
+  ['Control plane', 'The component that tracks worker nodes and instances, schedules browsers by load, collects metrics, and drives auto-healing.'],
+  ['Worker node', 'A host running the Machineuse agent; it launches and manages isolated browser containers and reports load to the control plane.'],
+  ['NNG mesh', 'The brokerless node-to-node messaging fabric (nanomsg-next-generation) that connects the control plane and workers with no external broker.'],
+  ['systemd-nspawn', 'A lightweight OS-level container manager in systemd; each browser runs in one for isolation.'],
+  ['Snapshot dormancy', 'Snapshotting an idle browser to reclaim its live resources, then reviving it on demand from the snapshot.'],
+  ['Load-aware scheduling', 'Placing each browser onto a worker chosen by capability and current utilization, not round-robin.'],
+];
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })),
+};
+const crumb = breadcrumb([
+  { name: 'Machineuse', item: HOME },
+  { name: 'FAQ', item: `${HOME}faq` },
+]);
+---
+<BaseLayout title={title} description={description} keywords={keywords} path="faq"
+  jsonLd={[faqSchema, softwareSchema, crumb]}>
+  <section class="hero" style="padding-bottom:0;">
+    <div class="wrap">
+      <Breadcrumbs items={[{ name: 'Machineuse', href: '/' }, { name: 'FAQ' }]} />
+      <span class="eyebrow">FAQ</span>
+      <h1>Machineuse <span class="grad">questions</span>, answered</h1>
+      <p class="lede">
+        High-intent answers about what Machineuse is, how it isolates browsers, snapshot dormancy,
+        self-hosting, and how it compares to managed browser clouds.
+      </p>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="faq" style="max-width:52rem;">
+        {faqs.map(([q, a]) => (
+          <details>
+            <summary>{q}</summary>
+            <p>{a}</p>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section style="background:var(--bg-soft); border-top:1px solid var(--border); border-bottom:1px solid var(--border);">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Glossary</span>
+        <h2>Key terms</h2>
+      </div>
+      <dl class="glossary prose">
+        {glossary.map(([t, d]) => (<><dt>{t}</dt><dd>{d}</dd></>))}
+      </dl>
+    </div>
+  </section>
+
+  <section style="text-align:center;">
+    <div class="wrap">
+      <h2>Still have questions?</h2>
+      <p style="max-width:34rem; margin:0 auto 2rem;">
+        Dig into the <a href="/architecture">architecture</a>, the <a href="/use-cases">use cases</a>, or the
+        <a href="/comparison">comparison</a> — or reach out to the team at <a href={WWW}>dotcommoners</a>.
+      </p>
+      <div style="display:flex; gap:.9rem; justify-content:center; flex-wrap:wrap;">
+        <a class="btn btn-primary" href={DOCS}>Read the docs</a>
+        <a class="btn btn-ghost" href="/contact">Contact us</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

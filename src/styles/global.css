@@ -122,3 +122,44 @@ section { padding: clamp(3rem, 8vw, 6rem) 0; }
 .site-footer .fine { color: var(--faint); font-size: .85rem; margin-top: 2.5rem; }
 
 .hr { height: 1px; background: var(--border); border: 0; margin: 0; }
+
+/* Breadcrumbs */
+.crumbs { font-family: var(--mono); font-size: .78rem; letter-spacing: .04em; color: var(--faint); margin-bottom: 1.4rem; }
+.crumbs a { color: var(--muted); }
+.crumbs a:hover { color: var(--text); }
+.crumbs span[aria-hidden] { margin: 0 .5rem; color: var(--border); }
+
+/* Answer / GEO summary block — makes the one-line definition extractable */
+.answer { background: var(--bg-soft); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: var(--radius); padding: 1.3rem 1.5rem; margin: 0 0 2rem; max-width: 52rem; }
+.answer p { margin: 0; color: var(--text); font-size: 1.02rem; }
+.answer p strong { color: var(--accent); font-weight: 600; }
+
+/* Prose (article body copy) */
+.prose { max-width: 52rem; }
+.prose h2 { margin-top: 3rem; }
+.prose h3 { margin-top: 2rem; color: var(--text); }
+.prose p, .prose li { color: var(--muted); }
+.prose ul, .prose ol { padding-left: 1.2rem; }
+.prose li { margin-bottom: .5rem; }
+.prose li::marker { color: var(--accent); }
+.prose strong { color: var(--text); }
+.prose a { text-decoration: underline; text-underline-offset: 2px; }
+
+/* Steps / numbered lifecycle */
+.steps { counter-reset: step; display: grid; gap: 1.2rem; }
+.steps .card { position: relative; padding-left: 3.6rem; }
+.steps .card::before { counter-increment: step; content: counter(step); position: absolute; left: 1.3rem; top: 1.6rem; width: 1.7rem; height: 1.7rem; display: grid; place-items: center; border-radius: 50%; font-family: var(--mono); font-size: .85rem; font-weight: 700; color: #041014; background: linear-gradient(120deg, var(--accent), var(--accent-2)); }
+
+/* Comparison table */
+.table-scroll { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius); }
+table.compare { width: 100%; border-collapse: collapse; font-size: .95rem; min-width: 640px; }
+table.compare th, table.compare td { text-align: left; padding: .85rem 1.1rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+table.compare thead th { color: var(--text); font-size: .82rem; text-transform: uppercase; letter-spacing: .08em; background: var(--bg-soft); }
+table.compare tbody th { color: var(--text); font-weight: 600; white-space: nowrap; }
+table.compare td { color: var(--muted); }
+table.compare tr:last-child td, table.compare tr:last-child th { border-bottom: 0; }
+table.compare .yes { color: var(--accent); }
+
+/* Glossary */
+.glossary dt { color: var(--text); font-weight: 700; margin-top: 1.2rem; }
+.glossary dd { color: var(--muted); margin: .3rem 0 0; }

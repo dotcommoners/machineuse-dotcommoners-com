@@ -1,5 +1,5 @@
 ---
-import { PROJECTS, CONTACT, GITHUB_ORG, DOCS, WWW } from '../data/site.js';
+import { CONTACT, GITHUB_ORG, DOCS, WWW } from '../data/site.js';
 const year = 2026;
 ---
 <footer class="site-footer">
@@ -14,13 +14,17 @@ const year = 2026;
         </p>
       </div>
       <div>
-        <h4>Projects</h4>
-        {PROJECTS.map((p) => <a href={p.site}>{p.name}</a>)}
+        <h4>Machineuse</h4>
+        <a href="/architecture">Architecture</a>
+        <a href="/use-cases">Use cases</a>
+        <a href="/comparison">Comparison</a>
+        <a href="/faq">FAQ</a>
       </div>
       <div>
         <h4>Resources</h4>
         <a href={DOCS}>Documentation</a>
         <a href={GITHUB_ORG}>GitHub</a>
+        <a href={WWW}>dotcommoners.com</a>
         <a href="/contact">Contact</a>
         <a href={`mailto:${CONTACT}`}>{CONTACT}</a>
       </div>

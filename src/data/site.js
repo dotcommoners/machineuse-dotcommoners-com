@@ -24,8 +24,75 @@ export const PROJECTS = [
 ];
 
 export const NAV = [
-  { label: 'dotcommoners', href: WWW },
+  { label: 'Architecture', href: '/architecture' },
+  { label: 'Use cases', href: '/use-cases' },
+  { label: 'Comparison', href: '/comparison' },
+  { label: 'FAQ', href: '/faq' },
   { label: 'Docs', href: DOCS },
   { label: 'GitHub', href: REPO },
-  { label: 'Contact', href: '/contact' },
 ];
+
+// Canonical one-line definition reused across pages + JSON-LD for consistent
+// answer-engine extraction.
+export const ONE_LINER =
+  'Machineuse is an open-source, distributed container manager for browser automation at scale, built by dotcommoners in Python. It creates, schedules, and manages isolated browser instances across many worker nodes with brokerless NNG messaging, load-aware scheduling, systemd-nspawn container isolation, and snapshot-based dormancy. MIT-licensed and self-hostable, with no SaaS lock-in.';
+
+// SoftwareSourceCode / SoftwareApplication schema for Machineuse, shared so every
+// page describes the product identically.
+export const softwareSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'Machineuse',
+  alternateName: 'Machineuse by dotcommoners',
+  applicationCategory: 'DeveloperApplication',
+  applicationSubCategory: 'Browser automation orchestration',
+  operatingSystem: 'Linux',
+  description: ONE_LINER,
+  url: 'https://machineuse.dotcommoners.com/',
+  sameAs: [REPO, DOCS],
+  codeRepository: REPO,
+  programmingLanguage: 'Python',
+  license: 'https://opensource.org/licenses/MIT',
+  isAccessibleForFree: true,
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  author: { '@type': 'Organization', name: 'dotcommoners', url: WWW },
+  keywords:
+    'distributed browser automation, headless browser cluster, systemd-nspawn, NNG, snapshot dormancy, self-hosted browser farm',
+};
+
+export const orgSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'dotcommoners',
+  url: WWW,
+  logo: 'https://machineuse.dotcommoners.com/favicon.svg',
+  description:
+    'dotcommoners builds open-source, self-hostable systems software for the commons, including Machineuse (distributed browser automation) and RevenProx (real-time SSE proxy).',
+  sameAs: [GITHUB_ORG],
+  email: CONTACT,
+};
+
+export const websiteSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'Machineuse',
+  url: 'https://machineuse.dotcommoners.com/',
+  description: ONE_LINER,
+  publisher: { '@type': 'Organization', name: 'dotcommoners', url: WWW },
+};
+
+// Build a BreadcrumbList for a deep page.
+export function breadcrumb(items) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: items.map((it, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      name: it.name,
+      item: it.item,
+    })),
+  };
+}
+
+export const HOME = 'https://machineuse.dotcommoners.com/';

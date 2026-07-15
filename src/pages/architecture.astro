@@ -1,0 +1,141 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import { REPO, DOCS, WWW, HOME, softwareSchema, breadcrumb } from '../data/site.js';
+
+const title = 'Machineuse Architecture — control plane, workers & NNG mesh';
+const description =
+  'How Machineuse works: a distributed control plane schedules isolated browsers onto worker nodes by live load, over a brokerless NNG mesh, with systemd-nspawn container isolation and snapshot-based dormancy.';
+const keywords = [
+  'machineuse architecture', 'distributed control plane', 'load-aware scheduling', 'brokerless NNG mesh',
+  'systemd-nspawn', 'snapshot dormancy', 'browser orchestration architecture', 'worker nodes',
+];
+
+const lifecycle = [
+  ['Request', 'A client asks the control plane for a browser instance with a given capability profile (image, resources, options).'],
+  ['Schedule', 'The control plane selects a worker node by capability and live load, so the session lands where there is real capacity.'],
+  ['Provision', 'The chosen worker launches the browser inside a dedicated systemd-nspawn container with its own filesystem and resources.'],
+  ['Run', 'The client drives the isolated browser. Per-node metrics stream back so the control plane always sees current utilization.'],
+  ['Dormancy', 'When an instance goes idle, it is snapshotted to dormancy — its state persisted and its live resources reclaimed.'],
+  ['Revival', 'On the next request for that session, the snapshot is revived on demand, restoring state without a cold rebuild.'],
+];
+
+const techArticle = {
+  '@context': 'https://schema.org',
+  '@type': 'TechArticle',
+  headline: 'Machineuse Architecture: control plane, workers, and the NNG mesh',
+  description,
+  author: { '@type': 'Organization', name: 'dotcommoners', url: WWW },
+  publisher: { '@type': 'Organization', name: 'dotcommoners', url: WWW },
+  about: 'Distributed browser automation orchestration',
+  url: `${HOME}architecture`,
+  mainEntityOfPage: `${HOME}architecture`,
+};
+const crumb = breadcrumb([
+  { name: 'Machineuse', item: HOME },
+  { name: 'Architecture', item: `${HOME}architecture` },
+]);
+---
+<BaseLayout title={title} description={description} keywords={keywords} path="architecture"
+  jsonLd={[techArticle, softwareSchema, crumb]}>
+  <section class="hero" style="padding-bottom:0;">
+    <div class="wrap">
+      <Breadcrumbs items={[{ name: 'Machineuse', href: '/' }, { name: 'Architecture' }]} />
+      <span class="eyebrow">How it works</span>
+      <h1>The Machineuse <span class="grad">architecture</span></h1>
+      <p class="lede">
+        A distributed control plane schedules isolated browsers onto worker nodes by live load, over a
+        brokerless NNG mesh — with systemd-nspawn container isolation and a snapshot-based dormancy lifecycle.
+      </p>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="answer">
+        <p>Machineuse has two roles: a <strong>control plane</strong> that schedules and tracks browser
+          instances, and <strong>worker nodes</strong> that run them. They coordinate over a brokerless
+          <strong>NNG mesh</strong> — no external message broker. Each browser is isolated in a
+          <strong>systemd-nspawn</strong> container, and idle instances are snapshotted to dormancy and
+          revived on demand.</p>
+      </div>
+
+      <div class="prose">
+        <h2 id="control-plane">The control plane</h2>
+        <p>
+          The control plane is the brain of the cluster. It tracks every worker node, the browser instances
+          running on them, and the live load each node is under. When a client requests a browser, the
+          control plane decides <em>where</em> that browser should run and instructs the appropriate worker
+          to provision it. It also collects real-time metrics and reacts to failures.
+        </p>
+
+        <h2 id="workers">Worker nodes</h2>
+        <p>
+          Worker nodes do the actual work of running browsers. Each worker runs an agent that joins the
+          control plane over NNG and reports its capabilities and current utilization. When told to, it
+          launches a browser inside an isolated container, keeps it healthy, and reports metrics back.
+          Scaling out is as simple as starting another worker agent and pointing it at the control plane —
+          scheduling adapts automatically.
+        </p>
+
+        <h2 id="scheduling">Load-aware scheduling</h2>
+        <p>
+          Placement is not round-robin. The control plane schedules each browser instance by
+          <strong>node capability and live load</strong>, so sessions land where there is genuine capacity
+          rather than piling onto a single overloaded host. This keeps latency predictable as the fleet grows
+          and prevents one heavy workload from degrading everything else on a node.
+        </p>
+
+        <h2 id="nng">Brokerless NNG mesh</h2>
+        <p>
+          Nodes communicate over a brokerless <strong>NNG</strong> (nanomsg-next-generation) mesh. There is
+          <strong>no external message broker</strong> — no RabbitMQ, Kafka, or Redis to deploy, secure, and
+          babysit as a single point of failure. Messaging is node-to-node, which keeps the operational surface
+          small and removes a common bottleneck in browser-grid deployments.
+        </p>
+
+        <h2 id="isolation">systemd-nspawn container isolation</h2>
+        <p>
+          Every browser runs in its own <strong>systemd-nspawn</strong> container with a dedicated filesystem
+          and resource envelope. systemd-nspawn is a lightweight OS-level container manager built into systemd,
+          giving each session a clean, reproducible environment that is isolated from every other session on the
+          same node. Untrusted pages, cookies, and state stay contained — one session cannot see or interfere
+          with another.
+        </p>
+
+        <h2 id="dormancy">Snapshot-based dormancy</h2>
+        <p>
+          Browsers are expensive to keep resident when idle. Machineuse addresses this with a
+          <strong>snapshot dormancy</strong> lifecycle: an idle instance is snapshotted — its state persisted
+          to a filesystem snapshot — and its live CPU and memory reclaimed for other work. When the session is
+          needed again, the snapshot is <strong>revived on demand</strong>, restoring state without a cold
+          rebuild. This lets a cluster hold far more logical sessions than it could keep simultaneously live.
+        </p>
+      </div>
+
+      <h2 style="margin-top:3rem;">Instance lifecycle</h2>
+      <div class="steps" style="margin-top:1.5rem; max-width:52rem;">
+        {lifecycle.map(([h, p]) => (
+          <div class="card"><h3>{h}</h3><p>{p}</p></div>
+        ))}
+      </div>
+
+      <div class="prose" style="margin-top:3rem;">
+        <h2 id="ops">Metrics &amp; auto-healing</h2>
+        <p>
+          The control plane maintains per-node time-series metrics and watches for failures. If a worker or
+          instance dies, failure detection triggers automatic recovery — including migrating instances so the
+          fleet keeps running without manual intervention.
+        </p>
+      </div>
+
+      <p style="margin-top:2.5rem;">
+        <a class="btn btn-primary" href={DOCS}>Read the full docs</a>
+        <a class="btn btn-ghost" href={REPO} style="margin-left:.6rem;">Source on GitHub →</a>
+      </p>
+      <p style="margin-top:1.5rem;">
+        Next: <a href="/use-cases">use cases</a> · <a href="/comparison">how it compares</a> · <a href="/faq">FAQ</a>
+      </p>
+    </div>
+  </section>
+</BaseLayout>

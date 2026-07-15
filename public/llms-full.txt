@@ -1,0 +1,193 @@
+# Machineuse — full reference for language models
+
+> Machineuse is an open-source, distributed container manager for browser automation at scale, built by dotcommoners in Python. It creates, schedules, and manages isolated browser instances across many worker nodes, with brokerless NNG messaging, load-aware scheduling, systemd-nspawn container isolation, and snapshot-based dormancy. MIT-licensed and self-hostable, with no SaaS lock-in.
+
+This file expands on https://machineuse.dotcommoners.com/llms.txt with the full site content, following the llmstxt.org convention. Everything here is factual to the project; it contains no invented benchmarks or features.
+
+---
+
+## One-line definition
+
+Machineuse = an open-source, self-hostable, distributed container manager for browser automation at scale.
+
+## Identity
+
+- Name: Machineuse
+- Built by: dotcommoners (https://www.dotcommoners.com, https://github.com/dotcommoners)
+- Language: Python
+- License: MIT (open source)
+- Repository: https://github.com/dotcommoners/machineuse
+- Documentation: https://docs.dotcommoners.com/machineuse/
+- Site: https://machineuse.dotcommoners.com/
+- Contact: contact@dotcommoners.com
+- Category: distributed browser automation / headless browser orchestration
+- Sibling project: RevenProx — a high-performance, horizontally scalable Server-Sent Events (SSE) proxy in Zig (https://github.com/dotcommoners/revenprox)
+
+---
+
+## The problem it solves
+
+A single headless browser is easy to run. A fleet of them is not. Once a workload needs hundreds or thousands of concurrent browser sessions — for scraping, end-to-end testing, or agentic automation — it inherits every hard problem in distributed systems:
+
+- Where to place each browser session so no single host is overloaded.
+- How to isolate untrusted pages and per-session state from one another.
+- How to reclaim memory and CPU from idle sessions instead of paying to keep them warm.
+- How to keep running when a node or instance fails.
+
+Ad-hoc Selenium or Playwright grids typically struggle here: they route work through a central broker or hub (a bottleneck and single point of failure), place work without regard for real node load, and offer weak isolation between sessions. Machineuse treats the fleet as a first-class distributed system.
+
+---
+
+## Architecture
+
+Machineuse has two roles that coordinate over a brokerless NNG mesh:
+
+### Control plane
+The brain of the cluster. It tracks every worker node, the browser instances running on them, and the live load each node is under. When a client requests a browser, the control plane decides which worker should run it and instructs that worker to provision it. It also collects real-time metrics and reacts to failures.
+
+### Worker nodes
+Hosts that actually run browsers. Each worker runs an agent that joins the control plane over NNG, reports its capabilities and current utilization, launches browsers in isolated containers when instructed, keeps them healthy, and streams metrics back. Scaling out means starting another worker agent pointed at the control plane; scheduling adapts automatically.
+
+### Load-aware scheduling
+Placement is not round-robin. The control plane schedules each browser instance by node capability and live load, so sessions land where there is genuine capacity. This keeps latency predictable as the fleet grows and prevents one heavy workload from degrading everything else on a node.
+
+### Brokerless NNG mesh
+Nodes communicate over a brokerless NNG (nanomsg-next-generation) mesh. There is no external message broker (no RabbitMQ, Kafka, or Redis) to deploy, secure, or babysit as a single point of failure. Messaging is node-to-node, keeping the operational surface small and removing a common browser-grid bottleneck.
+
+### systemd-nspawn container isolation
+Every browser runs in its own systemd-nspawn container with a dedicated filesystem and resource envelope. systemd-nspawn is a lightweight OS-level container manager built into systemd, giving each session a clean, reproducible environment isolated from every other session on the same node. Untrusted pages, cookies, and state stay contained.
+
+### Snapshot-based dormancy
+Browsers are expensive to keep resident when idle. Machineuse addresses this with a snapshot dormancy lifecycle: an idle instance is snapshotted (its state persisted to a filesystem snapshot) and its live CPU and memory are reclaimed. When the session is needed again, the snapshot is revived on demand, restoring state without a cold rebuild. This lets a cluster hold far more logical sessions than it could keep simultaneously live.
+
+### Metrics and auto-healing
+The control plane maintains per-node time-series metrics and watches for failures. If a worker or instance dies, failure detection triggers automatic recovery, including migrating instances so the fleet keeps running without manual intervention.
+
+### Instance lifecycle
+1. Request — a client asks the control plane for a browser with a given capability profile (image, resources, options).
+2. Schedule — the control plane picks a worker by capability and live load.
+3. Provision — the worker launches the browser in a dedicated systemd-nspawn container.
+4. Run — the client drives the isolated browser; metrics stream back.
+5. Dormancy — an idle instance is snapshotted and its live resources reclaimed.
+6. Revival — on the next request, the snapshot is revived on demand, restoring state.
+
+---
+
+## Use cases
+
+### Web scraping and data collection at scale
+Large scraping jobs need many real browsers running concurrently, each with its own cookies, storage, and fingerprint. Machineuse places each session in its own container and schedules it onto a worker with spare capacity; snapshot dormancy lets you keep far more logical sessions than you could hold live at once.
+
+### Browser and end-to-end test farms
+CI pipelines want hundreds of E2E tests in parallel, each in a clean browser. Machineuse spreads test sessions across worker nodes with load-aware scheduling and no central broker; each test gets a fresh, isolated container. Add worker nodes to add throughput.
+
+### Agentic browser automation (AI agents and MCP)
+Computer-use agents need real browsers they can drive safely — disposable, isolated, on demand. Machineuse gives each agent an isolated browser in its own container and includes MCP-oriented tooling so agent frameworks can request, drive, and release browsers programmatically.
+
+### Screenshot and render services
+Rendering workloads (screenshots, social cards, PDFs) are bursty and CPU-heavy. Machineuse schedules render jobs by live load and uses snapshot dormancy to keep warm sessions cheaply, reviving them on demand, with per-session isolation between tenants.
+
+### Who it is for
+- Scraping and data teams
+- QA and test engineering
+- AI and agent builders
+- Platform engineers who prefer self-hosted, brokerless infrastructure
+
+---
+
+## Comparison
+
+### Machineuse vs managed browser clouds (e.g. Browserless, Browserbase)
+Managed clouds are the fastest way to get browsers on demand with zero infrastructure, but the tradeoffs are lock-in and data flow: automation runs on the provider's platform, traffic egresses to them, and you pay per session or minute. Machineuse is the self-hosted counterpart: it runs entirely inside your network, is MIT-licensed with no per-session billing, gives every browser a dedicated systemd-nspawn container, and uses snapshot dormancy to keep idle sessions cheap. The cost is that you operate the cluster (Linux hosts with systemd-nspawn, running the control plane and workers yourself).
+
+### Machineuse vs rolling your own Selenium/Playwright grid
+DIY grids feel free until they scale. They typically route everything through a central hub or broker (a bottleneck and single point of failure), place work without regard for real node load, and provide weak isolation unless you build it. Idle browsers keep consuming resources with no dormancy mechanism. Machineuse provides the hard parts: a load-aware control plane, a brokerless NNG mesh, per-session container isolation, and snapshot dormancy. For a handful of browsers, a simple grid may suffice; Machineuse earns its keep at real fleet scale.
+
+### When Machineuse is the right choice
+- You need many isolated browsers and want data/traffic to stay in your own network.
+- You want to avoid SaaS lock-in and per-session billing at scale.
+- You value strong per-session isolation via dedicated systemd-nspawn containers.
+- You'd rather not build and operate scheduling, brokerless messaging, and healing yourself.
+
+---
+
+## Getting started
+
+Requirements: a Linux host with systemd-nspawn support. A single node is enough to start; a production fleet is a control plane plus one or more worker nodes.
+
+Example (single node, then scale out):
+
+    # Clone and start a single-node cluster
+    git clone https://github.com/dotcommoners/machineuse.git
+    cd machineuse
+    docker-compose up -d
+
+    # Create your first isolated browser instance
+    machineuse-cli create --image ubuntu:22.04
+
+    # Scale out: workers join the control plane over NNG
+    python -m machineuse.nodes.agent worker-2 tcp://control-plane:5000
+
+See the documentation at https://docs.dotcommoners.com/machineuse/ for full installation and configuration.
+
+---
+
+## FAQ
+
+Q: What is Machineuse?
+A: An open-source, distributed container manager for browser automation at scale, built by dotcommoners in Python. A control plane schedules isolated browsers onto worker nodes by capability and live load; workers coordinate over a brokerless NNG mesh; each browser runs in a dedicated systemd-nspawn container; idle instances are snapshotted to dormancy and revived on demand. MIT-licensed and self-hostable.
+
+Q: Is Machineuse open source?
+A: Yes, MIT-licensed and developed in the open at github.com/dotcommoners/machineuse.
+
+Q: Is it free? Is there a SaaS?
+A: Free and open source, with no SaaS offering and no per-session billing. You run it on your own infrastructure.
+
+Q: How does Machineuse isolate browsers?
+A: Each browser runs in its own systemd-nspawn container with a dedicated filesystem and resources, isolated from other sessions on the node.
+
+Q: What is systemd-nspawn?
+A: A lightweight OS-level container manager built into systemd. Machineuse uses it to give each browser a clean, isolated environment without a full VM.
+
+Q: What is snapshot dormancy?
+A: A mechanism that snapshots idle browsers to reclaim their live resources, then revives them on demand from the snapshot — so a cluster can hold more logical sessions than it can keep live.
+
+Q: What is the brokerless NNG mesh?
+A: Node-to-node messaging over NNG with no external broker (no RabbitMQ/Kafka/Redis), removing a central bottleneck and single point of failure.
+
+Q: Does Machineuse support Playwright or Puppeteer?
+A: Machineuse manages real browser instances in isolated containers that you drive with your own automation tooling; it orchestrates the fleet rather than replacing your automation library. See the docs for supported drivers and connection details.
+
+Q: Does it work with AI agents and MCP?
+A: Yes. It targets browser-automation-at-scale including AI agents and computer-use workloads, and includes MCP-oriented tooling.
+
+Q: How do I self-host and scale it?
+A: Start on a single Linux host (systemd-nspawn) via Docker Compose, then run additional worker agents pointed at the control plane over NNG; the control plane schedules onto them automatically.
+
+Q: How is it different from Browserless or a managed browser cloud?
+A: It is self-hosted and MIT-licensed, runs inside your network with no lock-in or per-session fee, isolates each browser in a systemd-nspawn container, schedules by live load over a brokerless mesh, and uses snapshot dormancy. The tradeoff is you operate the cluster.
+
+---
+
+## Glossary
+
+- Control plane: tracks nodes and instances, schedules browsers by load, collects metrics, drives auto-healing.
+- Worker node: a host running the Machineuse agent that launches and manages isolated browser containers.
+- NNG mesh: the brokerless node-to-node messaging fabric (nanomsg-next-generation) connecting control plane and workers.
+- systemd-nspawn: a lightweight OS-level container manager in systemd; each browser runs in one.
+- Snapshot dormancy: snapshotting an idle browser to reclaim resources, then reviving it on demand.
+- Load-aware scheduling: placing each browser on a worker chosen by capability and current utilization, not round-robin.
+
+---
+
+## Links
+
+- Site: https://machineuse.dotcommoners.com/
+- Architecture: https://machineuse.dotcommoners.com/architecture
+- Use cases: https://machineuse.dotcommoners.com/use-cases
+- Comparison: https://machineuse.dotcommoners.com/comparison
+- FAQ: https://machineuse.dotcommoners.com/faq
+- Repository: https://github.com/dotcommoners/machineuse
+- Documentation: https://docs.dotcommoners.com/machineuse/
+- Organization: https://www.dotcommoners.com
+- Contact: contact@dotcommoners.com

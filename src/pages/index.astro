@@ -1,70 +1,54 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { CONTACT, REPO, DOCS, WWW } from '../data/site.js';
+import {
+  CONTACT, REPO, DOCS, WWW, ONE_LINER,
+  softwareSchema, orgSchema, websiteSchema, breadcrumb,
+} from '../data/site.js';
 
 const title = 'Machineuse — Distributed browser automation at scale';
 const description =
-  'Machineuse is an open-source, distributed container manager for browser automation at scale. Create, schedule, and manage isolated browser instances across many nodes with brokerless NNG messaging, intelligent scheduling, and snapshot-based dormancy. Self-hostable, MIT-licensed, built in Python.';
+  'Machineuse is an open-source, distributed container manager for browser automation at scale. Schedule and run isolated browsers across worker nodes with brokerless NNG messaging, load-aware scheduling, systemd-nspawn isolation, and snapshot dormancy. Self-hosted, MIT, Python.';
 const keywords = [
   'machineuse', 'browser automation at scale', 'distributed browser automation', 'headless browser cluster',
   'browser instance orchestration', 'systemd-nspawn', 'container management', 'self-hosted browser automation',
-  'NNG messaging', 'browser farm', 'playwright cluster', 'MCP', 'dotcommoners',
+  'NNG messaging', 'browser farm', 'snapshot dormancy', 'playwright cluster', 'MCP', 'dotcommoners',
 ];
 
 const features = [
-  ['Distributed architecture', 'Horizontally scalable across many worker nodes. Add capacity by adding machines — the control plane schedules work automatically.'],
-  ['Brokerless NNG messaging', 'High-performance communication with no external message broker to run or babysit. Pure NNG, node-to-node.'],
-  ['Intelligent scheduling', 'Instances are placed by node capability and live load, so browser sessions land where there is capacity.'],
-  ['Container isolation', 'Each browser runs in a dedicated systemd-nspawn container with its own resources — clean, reproducible, and secure.'],
-  ['Snapshot dormancy', 'Pause idle instances to filesystem snapshots and revive them on demand. Reclaim resources without losing session state.'],
-  ['Real-time metrics & auto-healing', 'Time-series metrics per node and automatic failure detection with instance migration keep the fleet healthy.'],
+  ['Distributed control plane', 'A control plane schedules browser instances onto worker nodes by capability and live load. Add capacity by adding machines — scheduling adapts automatically.'],
+  ['Brokerless NNG mesh', 'Nodes communicate over a brokerless NNG mesh. There is no external message broker to deploy, secure, or babysit — messaging is node-to-node.'],
+  ['Load-aware scheduling', 'Instances are placed by node capability and current utilization, so sessions land where there is real capacity instead of overloading a single host.'],
+  ['systemd-nspawn isolation', 'Each browser runs in its own systemd-nspawn container with dedicated resources — clean, reproducible, and isolated from every other session on the node.'],
+  ['Snapshot-based dormancy', 'Idle instances are snapshotted to dormancy and revived on demand, reclaiming node resources without discarding session state.'],
+  ['Real-time metrics & auto-healing', 'Per-node time-series metrics plus automatic failure detection and instance migration keep the fleet healthy without manual intervention.'],
 ];
 
 const faqs = [
-  ['What is Machineuse?', 'Machineuse is an open-source platform for distributed container management of browser automation at scale. It lets you create, schedule, and manage isolated browser instances across a cluster of worker nodes, with intelligent load balancing and snapshot-based dormancy. It is built in Python and licensed MIT.'],
-  ['How is Machineuse different from a single headless browser or Selenium Grid?', 'Machineuse is built for scale and isolation from the ground up: each browser runs in its own systemd-nspawn container, nodes communicate over a brokerless NNG mesh (no central broker to operate), scheduling is load-aware, and idle instances can be snapshotted to dormancy to reclaim resources. It is designed to run a fleet, not a single browser.'],
-  ['Is Machineuse self-hostable and open source?', 'Yes. Machineuse is MIT-licensed and designed to be self-hosted on your own infrastructure — from a single node to a distributed cluster — with no SaaS dependency.'],
-  ['What do I need to run it?', 'A Linux host with systemd-nspawn support. You can start in minutes with Docker Compose for a single-node setup, then scale out to a distributed control plane and multiple worker nodes.'],
+  ['What is Machineuse?', 'Machineuse is an open-source, distributed container manager for browser automation at scale, built by dotcommoners in Python. It creates, schedules, and manages isolated browser instances across many worker nodes, with intelligent load-aware scheduling and snapshot-based dormancy. It is MIT-licensed and self-hostable.'],
+  ['How is Machineuse different from a Selenium/Playwright grid?', 'Machineuse is built for scale and isolation from the ground up: each browser runs in its own systemd-nspawn container, nodes talk over a brokerless NNG mesh (no central broker to operate), scheduling is load-aware, and idle instances can be snapshotted to dormancy to reclaim resources. It is designed to run a fleet, not a single browser or a fragile grid.'],
+  ['Is Machineuse self-hostable and open source?', 'Yes. Machineuse is MIT-licensed and designed to be self-hosted on your own infrastructure — from a single node to a distributed cluster — with no SaaS dependency or lock-in.'],
+  ['What do I need to run it?', 'A Linux host with systemd-nspawn support. You can start with Docker Compose for a single-node setup, then scale out to a distributed control plane and multiple worker nodes.'],
   ['Does it work with AI agents and MCP?', 'Yes. Machineuse targets browser-automation-at-scale use cases including AI agents and computer-use workloads, and the project includes MCP-oriented tooling for programmatic control.'],
 ];
-
-const appSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'SoftwareApplication',
-  name: 'Machineuse',
-  applicationCategory: 'DeveloperApplication',
-  operatingSystem: 'Linux',
-  description,
-  url: DOCS,
-  codeRepository: REPO,
-  programmingLanguage: 'Python',
-  license: 'https://opensource.org/licenses/MIT',
-  isAccessibleForFree: true,
-  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
-  author: { '@type': 'Organization', name: 'dotcommoners', url: WWW },
-};
 const faqSchema = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
   mainEntity: faqs.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })),
 };
-const breadcrumb = {
-  '@context': 'https://schema.org',
-  '@type': 'BreadcrumbList',
-  itemListElement: [
-    { '@type': 'ListItem', position: 1, name: 'dotcommoners', item: WWW },
-    { '@type': 'ListItem', position: 2, name: 'Machineuse', item: DOCS },
-  ],
-};
+const crumb = breadcrumb([
+  { name: 'dotcommoners', item: WWW },
+  { name: 'Machineuse', item: 'https://machineuse.dotcommoners.com/' },
+]);
 ---
-<BaseLayout title={title} description={description} keywords={keywords} path="" jsonLd={[appSchema, faqSchema, breadcrumb]}>
+<BaseLayout title={title} description={description} keywords={keywords} path=""
+  jsonLd={[softwareSchema, orgSchema, websiteSchema, faqSchema, crumb]}>
   <section class="hero">
     <div class="wrap">
       <span class="eyebrow">dotcommoners · Python · MIT</span>
       <h1>Browser automation, <span class="grad">at fleet scale</span>.</h1>
       <p class="lede">
         Machineuse is distributed container management for browser automation. Create, schedule, and
-        manage thousands of isolated browser instances across many nodes — with brokerless messaging,
+        manage thousands of isolated browser instances across many nodes — with brokerless NNG messaging,
         load-aware scheduling, and snapshot dormancy. Self-hosted and open source.
       </p>
       <div style="display:flex; gap:.9rem; flex-wrap:wrap; margin-top:2rem;">
@@ -76,7 +60,47 @@ const breadcrumb = {
 
   <hr class="hr" />
 
+  <!-- GEO answer block: single extractable definition -->
+  <section style="padding-top:clamp(2.5rem,6vw,4rem);">
+    <div class="wrap">
+      <div class="answer">
+        <p><strong>Machineuse</strong> is an open-source, distributed container manager for browser
+          automation at scale. A control plane schedules isolated browser instances onto worker nodes
+          by capability and live load; workers coordinate over a brokerless NNG mesh; each browser runs
+          in a dedicated <strong>systemd-nspawn</strong> container; and idle instances are snapshotted to
+          dormancy and revived on demand. Built in Python, MIT-licensed, and fully self-hostable.</p>
+      </div>
+    </div>
+  </section>
+
   <section>
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">The problem</span>
+        <h2>Running many browsers is a distributed-systems problem</h2>
+        <p>Scraping, end-to-end testing, and agentic automation all need real browsers — often thousands of them, concurrently.</p>
+      </div>
+      <div class="prose">
+        <p>
+          A single headless browser is easy. A <strong>fleet</strong> of them is not. Once you need hundreds or
+          thousands of concurrent browser sessions, you inherit every hard problem in distributed systems:
+          where to place each session, how to keep one runaway page from starving its neighbours, how to
+          isolate untrusted pages from each other, how to reclaim memory from idle sessions, and how to keep
+          the whole thing running when a node dies.
+        </p>
+        <p>
+          Ad-hoc Selenium or Playwright grids tend to fall over at exactly this point. They lean on a central
+          broker or hub, offer weak isolation between sessions, and place work without regard for real node
+          load. Machineuse treats the fleet as a first-class distributed system: a
+          <a href="/architecture">control plane and workers</a> that schedule by live load over a brokerless
+          mesh, with per-session container isolation and a snapshot lifecycle that reclaims resources from
+          idle browsers.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section style="background:var(--bg-soft); border-top:1px solid var(--border); border-bottom:1px solid var(--border);">
     <div class="wrap">
       <div class="section-head">
         <span class="eyebrow">Capabilities</span>
@@ -88,10 +112,11 @@ const breadcrumb = {
           <div class="card"><h3>{h}</h3><p>{p}</p></div>
         ))}
       </div>
+      <p style="margin-top:1.5rem;"><a href="/architecture">See how the architecture fits together →</a></p>
     </div>
   </section>
 
-  <section style="background:var(--bg-soft); border-top:1px solid var(--border); border-bottom:1px solid var(--border);">
+  <section>
     <div class="wrap">
       <div class="section-head">
         <span class="eyebrow">Quick start</span>
@@ -112,37 +137,41 @@ const breadcrumb = {
     </div>
   </section>
 
-  <section>
+  <section style="background:var(--bg-soft); border-top:1px solid var(--border); border-bottom:1px solid var(--border);">
     <div class="wrap">
       <div class="section-head">
         <span class="eyebrow">Use cases</span>
         <h2>Where teams run Machineuse</h2>
+        <p>For scraping, testing, and automation teams and the platform engineers who support them.</p>
       </div>
       <div class="grid grid-3">
         <div class="card"><h3>AI agents &amp; computer use</h3><p>Give agents and MCP tools a scalable pool of isolated, disposable browsers.</p></div>
-        <div class="card"><h3>Web scraping &amp; data collection</h3><p>Run large crawling and extraction workloads across nodes with per-session isolation.</p></div>
-        <div class="card"><h3>End-to-end testing at scale</h3><p>Parallelize browser test suites across a fleet without a fragile grid.</p></div>
+        <div class="card"><h3>Web scraping at scale</h3><p>Run large crawling and extraction workloads across nodes with per-session isolation.</p></div>
+        <div class="card"><h3>E2E test farms</h3><p>Parallelize browser test suites across a fleet without a fragile central grid.</p></div>
       </div>
+      <p style="margin-top:1.5rem;"><a href="/use-cases">Explore use cases in depth →</a></p>
     </div>
   </section>
 
-  <section style="background:var(--bg-soft); border-top:1px solid var(--border); border-bottom:1px solid var(--border);">
+  <section>
     <div class="wrap">
       <div class="section-head"><span class="eyebrow">FAQ</span><h2>Questions</h2></div>
       <div class="faq" style="max-width:48rem;">
         {faqs.map(([q, a]) => (<details><summary>{q}</summary><p>{a}</p></details>))}
       </div>
+      <p style="margin-top:1.5rem;"><a href="/faq">Read the full FAQ →</a> · <a href="/comparison">Compare Machineuse to the alternatives →</a></p>
     </div>
   </section>
 
-  <section style="text-align:center;">
+  <section style="text-align:center; background:var(--bg-soft); border-top:1px solid var(--border);">
     <div class="wrap">
       <h2>Start automating at scale</h2>
       <p style="max-width:34rem; margin:0 auto 2rem;">Read the docs, browse the source, or reach out. Open source and self-hostable.</p>
       <div style="display:flex; gap:.9rem; justify-content:center; flex-wrap:wrap;">
         <a class="btn btn-primary" href={REPO}>github.com/dotcommoners/machineuse</a>
-        <a class="btn btn-ghost" href={`mailto:${CONTACT}`}>{CONTACT}</a>
+        <a class="btn btn-ghost" href="/contact">Contact us</a>
       </div>
+      <p style="margin-top:1.2rem; font-size:.9rem;"><a href={`mailto:${CONTACT}`}>{CONTACT}</a></p>
     </div>
   </section>
 </BaseLayout>

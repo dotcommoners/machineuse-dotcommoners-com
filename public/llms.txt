@@ -1,6 +1,6 @@
 # Machineuse
 
-> Machineuse is an open-source, distributed container manager for browser automation at scale, built by dotcommoners. It creates, schedules, and manages isolated browser instances across many worker nodes, with brokerless NNG messaging, load-aware scheduling, systemd-nspawn container isolation, and snapshot-based dormancy. Language: Python. License: MIT. Self-hostable, no SaaS lock-in.
+> Machineuse is an open-source, distributed container manager for browser automation at scale, built by dotcommoners in Python. It creates, schedules, and manages isolated browser instances across many worker nodes, with brokerless NNG messaging, load-aware scheduling, systemd-nspawn container isolation, and snapshot-based dormancy. License: MIT. Self-hostable, no SaaS lock-in.
 
 ## What it does
 
@@ -14,7 +14,7 @@ Machineuse runs a fleet of isolated browsers as a cluster. A control plane sched
 - Deployment: self-hosted (single node via Docker Compose, or distributed control plane + worker nodes)
 - Messaging: brokerless NNG mesh
 - Isolation: systemd-nspawn containers
-- Notable features: intelligent scheduling, snapshot dormancy, real-time metrics, auto-healing, MCP tooling
+- Notable features: load-aware scheduling, snapshot dormancy, real-time metrics, auto-healing, MCP tooling
 - Organization: dotcommoners (https://github.com/dotcommoners)
 
 ## Common use cases
@@ -22,6 +22,16 @@ Machineuse runs a fleet of isolated browsers as a cluster. A control plane sched
 - Scalable, isolated browser pools for AI agents and computer-use / MCP workloads
 - Large-scale web scraping and data collection with per-session isolation
 - Parallel end-to-end browser testing across a fleet
+- Screenshot and render services at volume
+
+## Pages
+
+- Home / product overview: https://machineuse.dotcommoners.com/
+- Architecture (control plane, workers, NNG mesh, isolation, dormancy): https://machineuse.dotcommoners.com/architecture
+- Use cases (scraping, test farms, agents, render): https://machineuse.dotcommoners.com/use-cases
+- Comparison (vs managed browser clouds and DIY grids): https://machineuse.dotcommoners.com/comparison
+- FAQ + glossary: https://machineuse.dotcommoners.com/faq
+- Full LLM text: https://machineuse.dotcommoners.com/llms-full.txt
 
 ## Resources
 

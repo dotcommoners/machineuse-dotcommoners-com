@@ -1,0 +1,119 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import { REPO, DOCS, HOME, softwareSchema, breadcrumb } from '../data/site.js';
+
+const title = 'Machineuse Use Cases — scraping, test farms & agent browsers';
+const description =
+  'What Machineuse is for: scalable web scraping, browser and E2E test farms, agentic browser automation for AI agents and MCP, and screenshot/render services — all with per-session isolation.';
+const keywords = [
+  'web scraping at scale', 'browser test farm', 'e2e testing', 'agentic browser automation', 'AI agent browsers',
+  'MCP browser', 'screenshot service', 'render service', 'machineuse use cases',
+];
+
+const cases = [
+  {
+    h: 'Web scraping & data collection at scale',
+    lead: 'Run large crawling and extraction workloads across many nodes with per-session isolation.',
+    body: [
+      'Large scraping jobs need many real browsers running concurrently, each with its own cookies, storage, and fingerprint. Sharing one browser across targets leaks state and gets you blocked; running them all on one host melts it.',
+      'Machineuse places each scraping session in its own systemd-nspawn container and schedules it onto a worker with spare capacity. Sessions stay isolated from one another, and snapshot dormancy lets you keep far more logical sessions than you could hold live at once — reviving a session only when you need to crawl again.',
+    ],
+  },
+  {
+    h: 'Browser & end-to-end test farms',
+    lead: 'Parallelize browser test suites across a fleet without a fragile central grid.',
+    body: [
+      'CI pipelines want to run hundreds of end-to-end tests in parallel, each in a clean browser. Traditional Selenium/Playwright grids funnel this through a central hub that becomes a bottleneck and a single point of failure.',
+      'Machineuse spreads test sessions across worker nodes with load-aware scheduling and no central broker. Each test gets a fresh, isolated container, so tests never contaminate each other. Add worker nodes to add test throughput.',
+    ],
+  },
+  {
+    h: 'Agentic browser automation (AI agents & MCP)',
+    lead: 'Give AI agents and MCP tools a scalable pool of isolated, disposable browsers.',
+    body: [
+      'Computer-use agents need real browsers they can drive safely — ideally disposable, isolated, and available on demand. Handing an autonomous agent a shared browser is risky; provisioning a fresh VM per agent is slow and wasteful.',
+      'Machineuse gives each agent an isolated browser in its own container, scheduled onto available capacity. The project includes MCP-oriented tooling for programmatic control, so agent frameworks can request, drive, and release browsers as part of a fleet.',
+    ],
+  },
+  {
+    h: 'Screenshot & render services',
+    lead: 'Turn URLs and HTML into images or PDFs at volume, on isolated browsers.',
+    body: [
+      'Rendering services — screenshots, social cards, PDF generation — are bursty and CPU-heavy. Keeping browsers warm for every possible tenant is expensive; cold-starting one per request is slow.',
+      'Machineuse schedules render jobs onto workers by live load and uses snapshot dormancy to keep warm sessions cheaply, reviving them on demand. Per-session isolation keeps one tenant’s render from touching another’s.',
+    ],
+  },
+];
+
+const audience = [
+  ['Scraping & data teams', 'Reliable, isolated browser pools that scale horizontally as crawl volume grows.'],
+  ['QA & test engineering', 'Parallel E2E execution across a fleet with clean, reproducible browser environments.'],
+  ['AI & agent builders', 'On-demand isolated browsers for computer-use agents, exposed via MCP tooling.'],
+  ['Platform engineers', 'A self-hostable, brokerless system to operate — no SaaS bill, no central broker to babysit.'],
+];
+
+const crumb = breadcrumb([
+  { name: 'Machineuse', item: HOME },
+  { name: 'Use cases', item: `${HOME}use-cases` },
+]);
+---
+<BaseLayout title={title} description={description} keywords={keywords} path="use-cases"
+  jsonLd={[softwareSchema, crumb]}>
+  <section class="hero" style="padding-bottom:0;">
+    <div class="wrap">
+      <Breadcrumbs items={[{ name: 'Machineuse', href: '/' }, { name: 'Use cases' }]} />
+      <span class="eyebrow">Use cases</span>
+      <h1>What people build on <span class="grad">Machineuse</span></h1>
+      <p class="lede">
+        Anywhere you need many real, isolated browsers running concurrently — scraping, testing, agents,
+        and rendering — Machineuse runs them as a self-hosted fleet.
+      </p>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="answer">
+        <p>Machineuse is used for <strong>web scraping at scale</strong>, <strong>browser and E2E test
+          farms</strong>, <strong>agentic browser automation</strong> for AI agents and MCP tools, and
+          <strong>screenshot/render services</strong> — any workload that needs many isolated browsers
+          scheduled across worker nodes.</p>
+      </div>
+
+      {cases.map((c) => (
+        <div class="prose" style="margin-bottom:2.5rem;">
+          <h2>{c.h}</h2>
+          <p><strong>{c.lead}</strong></p>
+          {c.body.map((p) => <p>{p}</p>)}
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section style="background:var(--bg-soft); border-top:1px solid var(--border); border-bottom:1px solid var(--border);">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Who it's for</span>
+        <h2>Teams that run Machineuse</h2>
+      </div>
+      <div class="grid grid-2">
+        {audience.map(([h, p]) => (<div class="card"><h3>{h}</h3><p>{p}</p></div>))}
+      </div>
+    </div>
+  </section>
+
+  <section style="text-align:center;">
+    <div class="wrap">
+      <h2>See how it runs</h2>
+      <p style="max-width:34rem; margin:0 auto 2rem;">
+        Read the <a href="/architecture">architecture</a>, compare it to <a href="/comparison">the alternatives</a>,
+        or check the <a href="/faq">FAQ</a>.
+      </p>
+      <div style="display:flex; gap:.9rem; justify-content:center; flex-wrap:wrap;">
+        <a class="btn btn-primary" href={DOCS}>Read the docs</a>
+        <a class="btn btn-ghost" href={REPO}>View on GitHub →</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

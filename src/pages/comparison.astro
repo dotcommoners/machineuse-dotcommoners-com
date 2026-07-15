@@ -1,0 +1,125 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import { REPO, DOCS, HOME, softwareSchema, breadcrumb } from '../data/site.js';
+
+const title = 'Machineuse vs Browser Clouds & Selenium Grids — Comparison';
+const description =
+  'An honest comparison of Machineuse vs managed browser clouds (Browserless, Browserbase) and vs rolling your own Selenium/Playwright grid — self-hosting, isolation, brokerless messaging, and snapshot dormancy tradeoffs.';
+const keywords = [
+  'machineuse vs browserless', 'machineuse vs browserbase', 'self-hosted browserless alternative',
+  'selenium grid alternative', 'playwright grid', 'managed browser cloud', 'browser automation comparison',
+];
+
+const rows = [
+  ['Hosting model', 'Self-hosted, on your own infrastructure', 'Managed SaaS (their cloud)', 'Self-hosted (you build & run it)'],
+  ['Licensing / lock-in', 'Open source (MIT), no SaaS lock-in', 'Proprietary, usage-based billing', 'Open source components, DIY glue'],
+  ['Per-session isolation', 'Dedicated systemd-nspawn container per browser', 'Provider-managed isolation (varies)', 'Weak by default; process/container isolation is on you'],
+  ['Messaging / coordination', 'Brokerless NNG mesh — no central broker', 'Abstracted away (their platform)', 'Central hub/broker — a bottleneck & SPOF'],
+  ['Scheduling', 'Load-aware placement by node capability + live load', 'Provider-managed', 'Typically round-robin; capacity-blind'],
+  ['Idle-resource reclaim', 'Snapshot dormancy — snapshot idle, revive on demand', 'Billed per session/minute', 'None built in; you pay to keep browsers warm'],
+  ['Data & network control', 'Runs entirely inside your network', 'Traffic egresses to the provider', 'Fully in your network'],
+  ['Operational burden', 'You run the cluster (Linux + systemd-nspawn)', 'Lowest — provider operates it', 'Highest — you build scheduling, isolation, healing'],
+];
+
+const crumb = breadcrumb([
+  { name: 'Machineuse', item: HOME },
+  { name: 'Comparison', item: `${HOME}comparison` },
+]);
+---
+<BaseLayout title={title} description={description} keywords={keywords} path="comparison"
+  jsonLd={[softwareSchema, crumb]}>
+  <section class="hero" style="padding-bottom:0;">
+    <div class="wrap">
+      <Breadcrumbs items={[{ name: 'Machineuse', href: '/' }, { name: 'Comparison' }]} />
+      <span class="eyebrow">Comparison</span>
+      <h1>Machineuse vs the <span class="grad">alternatives</span></h1>
+      <p class="lede">
+        An honest look at Machineuse against managed browser clouds and against rolling your own
+        Selenium/Playwright grid — including where each option genuinely fits better.
+      </p>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="answer">
+        <p>Choose <strong>Machineuse</strong> when you want to <strong>self-host</strong> browser automation
+          at scale with strong per-session isolation and no SaaS lock-in. Choose a <strong>managed browser
+          cloud</strong> when you want zero operations and don’t mind sending traffic to a provider. Roll your
+          own grid only when your needs are small enough that scheduling, isolation, and healing aren’t worth
+          adopting a purpose-built system.</p>
+      </div>
+
+      <div class="table-scroll">
+        <table class="compare">
+          <thead>
+            <tr>
+              <th scope="col">Dimension</th>
+              <th scope="col">Machineuse</th>
+              <th scope="col">Managed browser cloud<br /><span style="font-weight:400; text-transform:none; letter-spacing:0; color:var(--muted);">(e.g. Browserless, Browserbase)</span></th>
+              <th scope="col">DIY Selenium / Playwright grid</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map(([dim, a, b, c]) => (
+              <tr>
+                <th scope="row">{dim}</th>
+                <td>{a}</td>
+                <td>{b}</td>
+                <td>{c}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="prose" style="margin-top:3rem;">
+        <h2>Machineuse vs managed browser clouds (Browserless, Browserbase)</h2>
+        <p>
+          Managed browser clouds are the fastest way to get browsers on demand: no infrastructure, no upgrades,
+          someone else on call. The tradeoffs are <strong>lock-in and data flow</strong> — your automation runs
+          on the provider’s platform, your traffic egresses to them, and you pay per session or minute, which
+          adds up at scale.
+        </p>
+        <p>
+          Machineuse is the self-hosted counterpart. It runs entirely inside your own network, is MIT-licensed
+          with no per-session billing, gives every browser a dedicated systemd-nspawn container, and uses
+          snapshot dormancy to keep idle sessions cheap. The cost is that <strong>you operate the cluster</strong>:
+          you need Linux hosts with systemd-nspawn and you run the control plane and workers yourself.
+        </p>
+
+        <h2>Machineuse vs rolling your own Selenium / Playwright grid</h2>
+        <p>
+          A DIY grid feels free until it scales. Selenium Grid and homegrown Playwright pools typically route
+          everything through a <strong>central hub or broker</strong> that becomes a bottleneck and single point
+          of failure, place work without regard for real node load, and provide weak isolation between sessions
+          unless you build container isolation yourself. Idle browsers keep consuming resources because there’s
+          no dormancy mechanism.
+        </p>
+        <p>
+          Machineuse gives you the parts that are hard to build well: a <a href="/architecture">load-aware
+          control plane</a>, a brokerless NNG mesh with no central hub, per-session container isolation, and a
+          snapshot dormancy lifecycle. If your workload is a handful of browsers, a simple grid may be all you
+          need — Machineuse earns its keep once you’re operating a real fleet.
+        </p>
+
+        <h2>When Machineuse is the right choice</h2>
+        <ul>
+          <li>You need many isolated browsers and want to keep data and traffic inside your own network.</li>
+          <li>You want to avoid SaaS lock-in and per-session billing at scale.</li>
+          <li>You value strong per-session isolation (dedicated systemd-nspawn containers).</li>
+          <li>You’d rather not build and operate scheduling, brokerless messaging, and healing yourself.</li>
+        </ul>
+      </div>
+
+      <p style="margin-top:2.5rem;">
+        <a class="btn btn-primary" href={DOCS}>Read the docs</a>
+        <a class="btn btn-ghost" href={REPO} style="margin-left:.6rem;">View on GitHub →</a>
+      </p>
+      <p style="margin-top:1.5rem;">
+        Related: <a href="/architecture">architecture</a> · <a href="/use-cases">use cases</a> · <a href="/faq">FAQ</a>
+      </p>
+    </div>
+  </section>
+</BaseLayout>
