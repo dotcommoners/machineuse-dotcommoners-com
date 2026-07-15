@@ -2,10 +2,10 @@
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 
-// Machineuse project site. Served under the docs domain at /machineuse/.
+// Machineuse project site. Served at its marketing subdomain root.
 export default defineConfig({
-  site: 'https://docs.dotcommoners.com',
-  base: '/machineuse/',
+  site: 'https://machineuse.dotcommoners.com',
+  base: '/',
   trailingSlash: 'ignore',
   build: { format: 'directory' },
   integrations: [sitemap()],
