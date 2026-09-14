@@ -2,11 +2,11 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
 import ArchDiagram from '../components/ArchDiagram.astro';
-import { REPO, DOCS, WWW, HOME, softwareSchema, breadcrumb } from '../data/site.js';
+import { REPO, DOCS, HOME, CORE_ORG_ID, softwareSchema, breadcrumb } from '../data/site.js';
 
 const title = 'Machineuse Architecture — control plane, workers & NNG mesh';
 const description =
-  'How Machineuse works: a distributed control plane schedules isolated browsers onto worker nodes by live load, over a brokerless NNG mesh, with systemd-nspawn container isolation and snapshot-based dormancy.';
+  'How Machineuse works: a control plane schedules isolated browsers onto worker nodes over a brokerless NNG mesh, with systemd-nspawn isolation and snapshot dormancy.';
 const keywords = [
   'machineuse architecture', 'distributed control plane', 'load-aware scheduling', 'brokerless NNG mesh',
   'systemd-nspawn', 'snapshot dormancy', 'browser orchestration architecture', 'worker nodes',
@@ -26,8 +26,8 @@ const techArticle = {
   '@type': 'TechArticle',
   headline: 'Machineuse Architecture: control plane, workers, and the NNG mesh',
   description,
-  author: { '@type': 'Organization', name: 'dotcommoners', url: WWW },
-  publisher: { '@type': 'Organization', name: 'dotcommoners', url: WWW },
+  author: { '@id': CORE_ORG_ID },
+  publisher: { '@id': CORE_ORG_ID },
   about: 'Distributed browser automation orchestration',
   url: `${HOME}architecture`,
   mainEntityOfPage: `${HOME}architecture`,

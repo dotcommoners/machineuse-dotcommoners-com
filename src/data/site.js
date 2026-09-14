@@ -74,13 +74,21 @@ export const orgSchema = {
   email: CONTACT,
 };
 
+// The core (www.dotcommoners.com) Organization node this spoke rolls up to.
+// Referenced by @id only -- never re-embedded as a full node here, so there is
+// exactly one description of that entity across the estate (the core's own).
+export const CORE_ORG_ID = 'https://www.dotcommoners.com/#organization';
+
 export const websiteSchema = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
+  '@id': 'https://machineuse.dotcommoners.com/#website',
   name: 'Machineuse',
   url: 'https://machineuse.dotcommoners.com/',
   description: ONE_LINER,
-  publisher: { '@type': 'Organization', name: 'dotcommoners', url: WWW },
+  inLanguage: 'en',
+  isPartOf: { '@id': CORE_ORG_ID },
+  publisher: { '@id': CORE_ORG_ID },
 };
 
 // Build a BreadcrumbList for a deep page.

@@ -4,12 +4,12 @@ import ClusterDiagram from '../components/ClusterDiagram.astro';
 import Icon from '../components/Icon.astro';
 import {
   CONTACT, REPO, DOCS, WWW,
-  softwareSchema, orgSchema, websiteSchema, breadcrumb, STATS,
+  softwareSchema, breadcrumb, STATS,
 } from '../data/site.js';
 
 const title = 'Machineuse — Distributed browser automation at scale';
 const description =
-  'Machineuse is an open-source, distributed container manager for browser automation at scale. Schedule isolated browsers across worker nodes with brokerless NNG messaging, load-aware scheduling, systemd-nspawn isolation, and snapshot dormancy. Self-hosted, MIT, Python.';
+  'Machineuse is an open-source, distributed container manager for browser automation at scale, using a brokerless NNG mesh. Self-hosted, MIT, Python.';
 const keywords = [
   'machineuse', 'browser automation at scale', 'distributed browser automation', 'headless browser cluster',
   'browser instance orchestration', 'systemd-nspawn', 'container management', 'self-hosted browser automation',
@@ -50,7 +50,7 @@ const crumb = breadcrumb([
 ]);
 ---
 <BaseLayout title={title} description={description} keywords={keywords} path=""
-  jsonLd={[softwareSchema, orgSchema, websiteSchema, faqSchema, crumb]}>
+  jsonLd={[softwareSchema, faqSchema, crumb]}>
 
   <!-- ============ HERO ============ -->
   <section class="hero-xl">

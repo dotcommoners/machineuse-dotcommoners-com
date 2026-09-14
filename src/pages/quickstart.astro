@@ -105,6 +105,35 @@ const howTo = {
           or secure a separate message broker.</p>
       </div>
 
+      <h2 id="verify" style="margin-top:2.5rem;">4 · Confirm the cluster is healthy</h2>
+      <p>
+        Before pointing real traffic at it, check that the control plane can see every worker you started.
+        <code>machineuse-cli ls</code> lists running instances alongside the worker each one landed on; if a
+        worker you just brought up never appears as a scheduling target, that is usually a sign its agent
+        can't reach the control plane's NNG address rather than a problem with the browser itself.
+      </p>
+      <div class="callout">
+        <span class="ci"><Icon name="pulse" /></span>
+        <p>Load-aware scheduling and auto-healing both read from the same per-node metrics feed. A worker
+          with no metrics reaching the control plane looks, to the scheduler, like a worker with no spare
+          capacity — checking that the metrics feed is flowing is usually the fastest way to find out why a
+          node isn't picking up new sessions.</p>
+      </div>
+
+      <h2 id="troubleshoot" style="margin-top:2.5rem;">5 · If something doesn't come up</h2>
+      <p>
+        Most first-run problems trace back to one of two things. First, confirm systemd-nspawn is actually
+        available on the host — Machineuse depends on it for container isolation and can't provision browsers
+        without it. Second, if the host is fine but one particular worker never joins, check for a network or
+        firewall rule between it and the control plane's address: the mesh is brokerless, so a worker that
+        can't dial the control plane directly over NNG has no fallback path in.
+      </p>
+      <p>
+        If an instance looks stuck rather than missing entirely, give auto-healing a little time before
+        restarting it by hand — failure detection and migration run off the same metrics feed described
+        above, which can lag by a cycle or two under heavy load before it reacts.
+      </p>
+
       <p style="margin-top:2.5rem;">
         <a class="btn btn-primary" href={DOCS}>Full installation guide</a>
         <a class="btn btn-ghost" href={REPO} style="margin-left:.6rem;">Source on GitHub →</a>

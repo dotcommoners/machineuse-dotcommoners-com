@@ -2,7 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
 import Icon from '../components/Icon.astro';
-import { REPO, DOCS, WWW, HOME, softwareSchema, breadcrumb } from '../data/site.js';
+import { REPO, DOCS, HOME, CORE_ORG_ID, softwareSchema, breadcrumb } from '../data/site.js';
 
 const title = 'Machineuse Features — scheduling, isolation & dormancy';
 const description =
@@ -51,8 +51,8 @@ const techArticle = {
   '@type': 'TechArticle',
   headline: 'Machineuse features',
   description,
-  author: { '@type': 'Organization', name: 'dotcommoners', url: WWW },
-  publisher: { '@type': 'Organization', name: 'dotcommoners', url: WWW },
+  author: { '@id': CORE_ORG_ID },
+  publisher: { '@id': CORE_ORG_ID },
   url: `${HOME}features`,
   mainEntityOfPage: `${HOME}features`,
 };
@@ -97,6 +97,35 @@ const techArticle = {
           </div>
         </div>
       ))}
+
+      <div class="prose" style="margin-top:2.5rem;">
+        <h2>How the pieces fit together</h2>
+        <p>
+          These features aren't independent checkboxes — they lean on each other. Load-aware scheduling
+          only works because the control plane has a live picture of every worker's utilization, and that
+          same metrics feed is what auto-healing watches for signs that a node has gone bad. A worker that
+          stops reporting metrics is, from the scheduler's point of view, indistinguishable from one with
+          no spare capacity — which is usually the first thing worth checking when new sessions stop
+          landing where expected.
+        </p>
+        <p>
+          Isolation and dormancy compound the same way. Because each browser already sits in its own
+          systemd-nspawn container, snapshotting one for dormancy is just persisting that container's
+          state — there is no shared session state to disentangle first, and reviving it later restores
+          the same container it left behind. The brokerless NNG mesh is what lets this scale horizontally
+          without a second bottleneck: with no central broker relaying every message, adding a worker node
+          adds a direct scheduling target rather than more load on something everyone shares.
+        </p>
+        <h2>What Machineuse does not do</h2>
+        <p>
+          Machineuse is fleet orchestration, not a browser automation library. It decides where a browser
+          runs, isolates it, and reclaims it when idle — it does not replace Playwright, Puppeteer, or
+          whatever driver already drives your automation. You connect your existing tooling to the browser
+          handle Machineuse hands back; it never sits between your code and the page itself. Keeping that
+          boundary narrow is what lets the orchestration layer stay small and lets teams keep whatever
+          automation stack they already use.
+        </p>
+      </div>
 
       <div class="callout" style="margin-top:2.5rem;">
         <span class="ci"><Icon name="info" /></span>
